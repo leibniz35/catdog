@@ -3,4 +3,3 @@ fastai>=0.0.16
 pillow<7
 packaging
 ipywidgets==7.5.1
-torch.__version__ = 1.6.0
