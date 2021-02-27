@@ -20,4 +20,7 @@ class ModelPredict():
 		pred_class , pred_idx, outputs = learn.predict(img)
 		return str(pred_class)
 
+if __name__=='__main__':
+	m = ModelPredict('kedi.jpg').predict()
+	print(m)
 
