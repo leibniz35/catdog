@@ -9,7 +9,7 @@ class ModelPredict():
 
 	def download_model(self):
 		if path.exists('export.pkl') == False:
-			url = 'https://drive.google.com/uc?export=download&id=1e-CSvNRED7__dwWsvSZ95ydsE74vSz-3'
+			url = 'http://dl.dropboxusercontent.com/s/8i2fj3abxgqotdq/export.pkl?dl=0'
 			filename = 'export.pkl'
 			urlretrieve(url,filename)
 
