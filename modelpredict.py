@@ -1,4 +1,4 @@
-from fastai.vision import *
+vvfrom fastai.vision import *
 from urllib.request import urlretrieve
 from os import path
 from random import choice
@@ -9,7 +9,7 @@ class ModelPredict():
 
 	def download_model(self):
 		if path.exists('export.pkl') == False:
-			url = ''
+			url = 'https://drive.google.com/uc?id=1V30NUR4t0pZ0a76d8NMx5XQ7NSSbyR__&export=download'
 			filename = 'export.pkl'
 			urlretrieve(url,filename)
 
