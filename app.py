@@ -1,46 +1,26 @@
-from fastapi import FastAPI, Request, File, UploadFile
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, FileResponse
-from glob import glob
-from modelpredict import ModelPredict
-from os import remove
+from flask import Flask, request
+from flask_cors import CORS
+from flask import render_template
+from fastai.vision.all import *
 
-app = FastAPI()
+#Labeling function required for load_learner to work
+def GetLabel(fileName):
+  return fileName.split('-')[0]
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-templates = Jinja2Templates(directory="templates")
+learn = load_learner(Path('server/export.pkl')) #Import Model
+app = Flask(__name__)
+cors = CORS(app) #Request will get blocked otherwise on Localhost
 
-files_to_remove = []
+@app.route("/")
+def index():
+    return render_template("index.html")
 
+@app.route('/predict', methods=['GET', 'POST'])
+def predict():
+    img = PILImage.create(request.files['file'])
+    label,_,probs = learn.predict(img)
+    return f'{label} ({torch.max(probs).item()*100:.0f}%)'
 
-@app.get("/")
-async def root(request: Request):
-    print(files_to_remove)
-    try:    
-        for x in files_to_remove:
-            remove(x)
-            files_to_remove.remove(x)
-    except Exception as e:
-        print(e)
-    return templates.TemplateResponse("index.html", {
-        'request': request,
-    })
+if __name__=='__main__':
+    app.run(host="0.0.0.0", port=5000)
 
-@app.post("/predict/")
-async def create_upload_files(request: Request,file: UploadFile = File(...)):
-    if 'image' in file.content_type:
-        contents = await file.read()
-        filename = 'static/' + file.filename
-        with open(filename, 'wb') as f:
-            f.write(contents)
-        m = ModelPredict(filename).predict()
-        files_to_remove.append(filename) 
-
-        return templates.TemplateResponse("predict.html", {
-            "request": request,
-            "filename": file.filename,
-            "Predict": m
-        })
-    else:
-        return {"Error":'Not a Valid File - upload image pls'}
